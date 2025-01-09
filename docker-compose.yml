@@ -1,31 +1,34 @@
 version: '3.8'
-
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
+    container_name: usermodule-app
     ports:
       - "8080:8080"
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/epolldb
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/userdb
       SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: 1522858@Pati
-      SPRING_MAIL_USERNAME: your_gmail_username
-      SPRING_MAIL_PASSWORD: your_gmail_password
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_MAIL_USERNAME: ${SPRING_MAIL_USERNAME}
+      SPRING_MAIL_PASSWORD: ${SPRING_MAIL_PASSWORD}
+      SPRING_DATASOURCE_DRIVER-CLASS-NAME: com.mysql.cj.jdbc.Driver
+      SPRING_JPA_HIBERNATE_DDL-AUTO: update
     depends_on:
-      - mysql
+      - db
+    networks:
+      - app-network
 
-  mysql:
+  db:
     image: mysql:8.0
-    container_name: mysql
+    container_name: usermodule-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: userdb
     ports:
       - "3306:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: 1522858@Pati
-      MYSQL_DATABASE: epolldb
-    volumes:
-      - mysql-data:/var/lib/mysql
+    networks:
+      - app-network
 
-volumes:
-  mysql-data:
+networks:
+  app-network:
+    driver: bridge
